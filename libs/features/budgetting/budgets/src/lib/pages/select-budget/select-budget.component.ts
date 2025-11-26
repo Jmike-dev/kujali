@@ -57,7 +57,6 @@ export class SelectBudgetPageComponent implements OnInit {
     this.overview$ = this._orgBudgets$$.get();
     this.sharedBudgets$ = this._budgets$$.get();
 
-    // Convert to signals
     this.overview = toSignal(this.overview$, { initialValue: null });
     this.sharedBudgets = toSignal(this.sharedBudgets$, { initialValue: [] });
 
