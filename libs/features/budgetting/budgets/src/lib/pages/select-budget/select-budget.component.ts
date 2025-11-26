@@ -19,6 +19,7 @@ import {
 } from '@app/state/finance/budgetting/budgets';
 
 import { CreateBudgetModalComponent } from '../../components/create-budget-modal/create-budget-modal.component';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-select-budget',
@@ -40,6 +41,13 @@ export class SelectBudgetPageComponent implements OnInit {
 
   allBudgets$: Observable<{ overview: BudgetRecord[]; budgets: any[] }>;
 
+  overview = toSignal(this.overview$, { initialValue: null });
+  sharedBudgets = toSignal(this.sharedBudgets$, { initialValue: [] });
+
+  allBudgets = toSignal(this.allBudgets$, {
+    initialValue: { overview: [], budgets: [] },
+  });
+
   _orgBudgets$$ = inject(OrgBudgetsStore);
   _budgets$$ = inject(BudgetsStore);
   _dialog = inject(MatDialog);
@@ -48,6 +56,10 @@ export class SelectBudgetPageComponent implements OnInit {
   ngOnInit() {
     this.overview$ = this._orgBudgets$$.get();
     this.sharedBudgets$ = this._budgets$$.get();
+
+    // Convert to signals
+    this.overview = toSignal(this.overview$, { initialValue: null });
+    this.sharedBudgets = toSignal(this.sharedBudgets$, { initialValue: [] });
 
     this.allBudgets$ = combineLatest([
       this.overview$,
@@ -61,10 +73,14 @@ export class SelectBudgetPageComponent implements OnInit {
           budget['endYear'] = budget.startYear + budget.duration - 1;
           return budget;
         });
-        // this.budgetsLoaded = true;
         return { overview: overview.overview, budgets: trBudgets };
       })
     );
+
+    // Convert allBudgets$ to signal
+    this.allBudgets = toSignal(this.allBudgets$, {
+      initialValue: { overview: [], budgets: [] },
+    });
   }
 
   applyFilter(event: Event) {
